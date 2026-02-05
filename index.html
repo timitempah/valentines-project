@@ -27,7 +27,6 @@ body {
   border-radius: 25px;
   text-align: center;
   box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-  position: relative;
 }
 
 .card img {
@@ -58,7 +57,6 @@ button {
 
 #noBtn {
   background-color: #e0e0e0;
-  position: absolute;
 }
 
 .backBtn {
@@ -82,29 +80,38 @@ button {
 
 <body>
 
+<!-- HOME SCREEN -->
 <div class="card" id="home">
   <img src="images/minion-heart.png" alt="Minion holding heart">
   <h1>Orekelewa, will you be my Valentine? 💕🥹</h1>
   <button id="yesBtn" onclick="showYes()">Yes 💖</button>
-  <button id="noBtn" onmouseover="moveNo()">No 🙃</button>
+  <button id="noBtn" onclick="showNo()">No 🙃</button>
 </div>
 
-<audio id="loveSong" src="audio/wgft.mp3" preload="auto"></audio>
+<!-- YES SCREEN -->
+<div class="card" id="yesScreen" style="display:none;">
+  <img src="images/minion-bg.jpg" alt="Minion love">
+  <h1>Friday, 13th Feb 2026</h1>
+  <p>Dress code: Naked 😏</p>
+  <p>Time: 11:59pm till dawn 🌙</p>
+  <h3 id="countdown"></h3>
+  <p>Save the date 💖</p>
+  <button class="backBtn" onclick="goHome()">Back</button>
+</div>
+
+<!-- NO SCREEN -->
+<div class="card" id="noScreen" style="display:none;">
+  <h1>Hello 😌</h1>
+  <p>Get down.</p>
+  <p>Get down now lol!</p>
+  <button class="backBtn" onclick="goHome()">Back</button>
+</div>
+
+<!-- AUDIO (NEVER REMOVED) -->
+<audio id="loveSong" src="audio/wgft.mp3" preload="auto" loop></audio>
 
 <script>
-const homeHTML = document.getElementById("home").outerHTML;
-
-function moveNo() {
-  const btn = document.getElementById("noBtn");
-  const card = document.querySelector(".card");
-
-  const maxX = card.offsetWidth - btn.offsetWidth;
-  const maxY = card.offsetHeight - btn.offsetHeight;
-
-  btn.style.left = Math.random() * maxX + "px";
-  btn.style.top = Math.random() * maxY + "px";
-}
-
+// floating hearts
 function createHeart() {
   const heart = document.createElement("div");
   heart.className = "heart";
@@ -114,48 +121,49 @@ function createHeart() {
   document.body.appendChild(heart);
   setTimeout(() => heart.remove(), 7000);
 }
-
 setInterval(createHeart, 700);
 
+// screen controls
 function showYes() {
-  const song = document.getElementById("loveSong");
-  song.play().catch(() => {});
+  document.getElementById("home").style.display = "none";
+  document.getElementById("noScreen").style.display = "none";
+  document.getElementById("yesScreen").style.display = "block";
 
-  document.body.innerHTML = `
-    <div class="card">
-      <img src="images/minion-bg.jpg" alt="Minion love">
-      <h1>Friday, 13th Feb 2026</h1>
-      <p>Dress code: Naked 😏</p>
-      <p>Time: 11:59pm till dawn 🌙</p>
-      <h3 id="countdown"></h3>
-      <p>Save the date 💖</p>
-      <button class="backBtn" onclick="goHome()">Back</button>
-    </div>
-  `;
+  const song = document.getElementById("loveSong");
+  song.currentTime = 0;
+  song.play().catch(() => {});
 
   startCountdown();
 }
 
-function goHome() {
-  document.body.innerHTML = homeHTML;
+function showNo() {
+  document.getElementById("home").style.display = "none";
+  document.getElementById("yesScreen").style.display = "none";
+  document.getElementById("noScreen").style.display = "block";
 }
 
+function goHome() {
+  document.getElementById("yesScreen").style.display = "none";
+  document.getElementById("noScreen").style.display = "none";
+  document.getElementById("home").style.display = "block";
+}
+
+// countdown
 function startCountdown() {
   const target = new Date("February 13, 2026 23:59:00").getTime();
 
   setInterval(() => {
     const now = new Date().getTime();
     const diff = target - now;
-
-    if (diff < 0) return;
+    if (diff <= 0) return;
 
     const d = Math.floor(diff / (1000 * 60 * 60 * 24));
     const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
     const m = Math.floor((diff / (1000 * 60)) % 60);
     const s = Math.floor((diff / 1000) % 60);
 
-    const el = document.getElementById("countdown");
-    if (el) el.textContent = `${d}d ${h}h ${m}m ${s}s`;
+    document.getElementById("countdown").textContent =
+      `${d}d ${h}h ${m}m ${s}s`;
   }, 1000);
 }
 </script>
