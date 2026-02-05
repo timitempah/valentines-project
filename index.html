@@ -16,7 +16,6 @@ body {
   align-items: center;
   background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
   font-family: 'Poppins', sans-serif;
-  overflow: hidden;
 }
 
 .card {
@@ -27,7 +26,6 @@ body {
   border-radius: 25px;
   text-align: center;
   box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-  position: relative;
 }
 
 .card img {
@@ -39,13 +37,18 @@ h1 {
   font-family: 'Pacifico', cursive;
   color: #ff5fa2;
   font-size: 26px;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
+}
+
+p {
+  font-size: 16px;
+  margin: 6px 0;
 }
 
 button {
-  padding: 12px 22px;
+  padding: 12px 24px;
   font-size: 15px;
-  margin: 8px;
+  margin: 10px;
   border: none;
   border-radius: 14px;
   cursor: pointer;
@@ -56,74 +59,39 @@ button {
   color: white;
 }
 
-#noBtn {
-  background-color: #e0e0e0;
-  position: absolute;
-}
-
+#noBtn,
 .backBtn {
-  background: #ddd;
-  margin-top: 15px;
-}
-
-.heart {
-  position: fixed;
-  bottom: -20px;
-  font-size: 18px;
-  animation: floatUp 6s linear infinite;
-}
-
-@keyframes floatUp {
-  from { transform: translateY(0); opacity: 1; }
-  to { transform: translateY(-110vh); opacity: 0; }
+  background-color: #e0e0e0;
 }
 </style>
 </head>
 
 <body>
 
-<div class="card" id="home">
-  <img src="images/minion-heart.png" alt="Minion holding heart">
+<!-- HOME SCREEN -->
+<div class="card" id="homeScreen">
+  <img src="images/minion%20heart%202.jpg" alt="Minion holding heart">
   <h1>Orekelewa, will you be my Valentine? 💕🥹</h1>
   <button id="yesBtn" onclick="showYes()">Yes 💖</button>
-  <button id="noBtn" onmouseover="moveNo()">No 🙃</button>
+  <button id="noBtn" onclick="showNo()">No 🙃</button>
 </div>
 
+<!-- AUDIO -->
 <audio id="loveSong" src="audio/wgft.mp3" preload="auto"></audio>
 
 <script>
-const homeHTML = document.getElementById("home").outerHTML;
-
-function moveNo() {
-  const btn = document.getElementById("noBtn");
-  const card = document.querySelector(".card");
-
-  const maxX = card.offsetWidth - btn.offsetWidth;
-  const maxY = card.offsetHeight - btn.offsetHeight;
-
-  btn.style.left = Math.random() * maxX + "px";
-  btn.style.top = Math.random() * maxY + "px";
-}
-
-function createHeart() {
-  const heart = document.createElement("div");
-  heart.className = "heart";
-  heart.textContent = "💖";
-  heart.style.left = Math.random() * 100 + "vw";
-  heart.style.animationDuration = (4 + Math.random() * 4) + "s";
-  document.body.appendChild(heart);
-  setTimeout(() => heart.remove(), 7000);
-}
-
-setInterval(createHeart, 700);
+const homeHTML = document.body.innerHTML;
 
 function showYes() {
   const song = document.getElementById("loveSong");
+
+  // Mobile-safe audio trigger
+  song.currentTime = 0;
   song.play().catch(() => {});
 
   document.body.innerHTML = `
     <div class="card">
-      <img src="images/minion-bg.jpg" alt="Minion love">
+      <img src="images/minion%20background%202.jpg" alt="Minion love">
       <h1>Friday, 13th Feb 2026</h1>
       <p>Dress code: Naked 😏</p>
       <p>Time: 11:59pm till dawn 🌙</p>
@@ -136,26 +104,38 @@ function showYes() {
   startCountdown();
 }
 
+function showNo() {
+  document.body.innerHTML = `
+    <div class="card">
+      <h1>Hello 😌</h1>
+      <p>Get down.</p>
+      <p>Get down now lol!</p>
+      <button class="backBtn" onclick="goHome()">Back</button>
+    </div>
+  `;
+}
+
 function goHome() {
-  document.body.innerHTML = homeHTML;
+  location.reload();
 }
 
 function startCountdown() {
-  const target = new Date("February 13, 2026 23:59:00").getTime();
+  const targetDate = new Date("February 13, 2026 23:59:00").getTime();
 
   setInterval(() => {
     const now = new Date().getTime();
-    const diff = target - now;
+    const diff = targetDate - now;
+    if (diff <= 0) return;
 
-    if (diff < 0) return;
-
-    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    const m = Math.floor((diff / (1000 * 60)) % 60);
-    const s = Math.floor((diff / 1000) % 60);
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
 
     const el = document.getElementById("countdown");
-    if (el) el.textContent = `${d}d ${h}h ${m}m ${s}s`;
+    if (el) {
+      el.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    }
   }, 1000);
 }
 </script>
